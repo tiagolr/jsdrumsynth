@@ -9,7 +9,7 @@ import ds.svf_filter.jsfx-inc
 import ds.pad.jsfx-inc
 
 // PAD1
-slider1:mix=-1<-1, 1, .01>Mix (Osc - Noise)
+slider1:mix=-1<-1, 1, .01>-Mix (Osc - Noise)
 slider2:vol=-12<-90, 0, .01>-Volume
 slider3:pan=0<-1, 1, .01>-Pan
 slider4:distortion=0<0, 48, 0.1>-Drive Db
@@ -25,7 +25,7 @@ slider11:pitch_att=1<1, 5000, 1:log>-Pitch attack
 slider12:pitch_dec=70<1, 5000, 1:log>-Pitch decay
 slider13:pitch_shape=0<-1, 1, 0.01>-Pitch shape
 
-slider15:noise_stereo=0<0, 1, 1{No,Yes}>-Stereo noise
+slider15:noise_stereo=0<0, 1, 1{No,Yes}Stereo noise
 slider16:noise_cutoff=22050<20,22050,1:log>-Noise color
 slider17:noise_att=1<1,5000, 1:log>-Noise attack
 slider18:noise_dec=70<1,5000, 1:log>-Noise decay
@@ -39,7 +39,7 @@ slider23:filter_sel=0<1, 0, 1{Noise,Osc,Both}>-Filter target
 slider24:eq_freq=440<20, 22050, 1:log>-EQ frequency
 slider25:eq_gain=0<0, -18, 18>-EQ gain
 slider26:eq_q=0.70<0.01, 40, 0.01:log>-EQ Q
-slider27:vel_vol=0<0, 1, 0.01>Velocity volume
+slider27:vel_vol=0<0, 1, 0.01>-Velocity volume
 
 // PAD2
 slider33:-1<-1, 1, .01>-Mix (Osc - Noise)
@@ -79,10 +79,7 @@ options:gfx_hz=60;
 
 @init
 
-osc_cycle = 0;
-note_on = 0;
-note_vel = 0;
-note_counter = 0;
+pad = 1;
 notes = 0;
 notes[0]="C";notes[1]="C#";notes[2]="D";notes[3]="D#";
 notes[4]="E";notes[5]="F";notes[6]="F#";notes[7]="G";
@@ -91,10 +88,21 @@ notes[8]="G#";notes[9]="A";notes[10]="A#";notes[11]="B";
 function db2gain(db) (10^(db / 20););
 function round(in) (floor(in + 0.5 * sign(in)););
 function freq2note(f) ( round(12*(log(f/440)/log(2))+69); );
+function getslider(n) (
+  slider(n + 32 * pad);
+);
+function setslider(n, val) (
+  slider(n + 32 * pad) = val
+);
 
 function get_note_name() (
-  note = freq2note(osc_freq);
+  note = freq2note(getslider(5));
   sprintf(#, "%s%i", notes[note % 12], floor(note / 12) - 1);
+);
+
+function on_slider () (
+  pad == 0 ? pad1.pad_on_slider() :
+  pad2.pad_on_slider();
 );
 
 pad1.pad_init(0);
@@ -125,39 +133,40 @@ pad1.pad_process();
 pad2.pad_process();
 
 spl0 += pad1.out_l + pad2.out_l;
-spl1 += pad1.out_r + pad2.out_l;
+spl1 += pad1.out_r + pad2.out_r;
 
-@gfx 700 280
+@gfx 700 320
 
 gfx_clear = 0x141618;
 mouse.update_mouse_state();
 
-/*
 set_color(0x666666);
 gfx_x = 20; gfx_y = 20;
 gfx_drawstr("MIX");
 
-draw_knob(20, 40, 1, "Mix", 0, -1, 1, 0, 1, sprintf(#, "%.2f", slider(1)));
-draw_knob(80, 40, 2, "Vol", -12, -90, 0, 0, 0, sprintf(#, "%.1f Db", slider(2)));
-draw_knob(20, 110, 3, "Pan", 0, -1, 1, 0, 1, sprintf(#, "%.2f", slider(3)));
-draw_knob(80, 110, 4, "Drive", 0, 0, 48, 0, 0, sprintf(#, "%.1f Db", slider(4)));
+draw_knob(20, 40, 1+32*pad, "Mix", 0, -1, 1, 0, 1, sprintf(#, "%.2f", getslider(1)));
+draw_knob(80, 40, 2+32*pad, "Vol", -12, -90, 0, 0, 0, sprintf(#, "%.1f Db", getslider(2)));
+draw_knob(20, 110, 3+32*pad, "Pan", 0, -1, 1, 0, 1, sprintf(#, "%.2f", getslider(3)));
+draw_knob(80, 110, 4+32*pad, "Drive", 0, 0, 48, 0, 0, sprintf(#, "%.1f Db", getslider(4)));
 
 set_color(0x666666);
 gfx_line(140, 40, 140, 170);
 gfx_x = 140; gfx_y = 20;
 gfx_drawstr(sprintf(#, "OSC %s", get_note_name()));
 
-draw_knob(160, 40, 5, "Freq", 440, 20, 10000, 1, 0, sprintf(#, "%i Hz", slider(5)));
-draw_knob(220, 40, 7, "Att", 1, 1, 5000, 1, 0, sprintf(#, "%i ms", slider(7)));
-draw_knob(160, 110, 8, "Dec", 70, 1, 5000, 1, 0, sprintf(#, "%i ms", slider(8)));
-draw_knob(220, 110, 9, "Shape", 0, -1, 1, 0, 1, sprintf(#, "%.2f", slider(9)));
+draw_knob(160, 40, 5+32*pad, "Freq", 440, 20, 10000, 1, 0, sprintf(#, "%i Hz", getslider(5)));
+draw_knob(220, 40, 7+32*pad, "Att", 1, 1, 5000, 1, 0, sprintf(#, "%i ms", getslider(7)));
+draw_knob(160, 110, 8+32*pad, "Dec", 70, 1, 5000, 1, 0, sprintf(#, "%i ms", getslider(8)));
+draw_knob(220, 110, 9+32*pad, "Shape", 0, -1, 1, 0, 1, sprintf(#, "%.2f", getslider(9)));
 
+osc_wave = getslider(6);
 shape_name = osc_wave == 0 ? "Sin" : osc_wave == 1 ? "Tri" : osc_wave == 2 ? "Saw" : "Sqr";
 draw_button(220, 20, 40, shape_name, 0);
 mouse.left_click && mouse_in_rect(220, 20 - 2, 40, 10 + 2) ? (
   gfx_x = 220; gfx_y = 30;
   choice = gfx_showmenu("Sine|Triangle|Saw|Square");
-  slider(6) = max(choice - 1, 0);
+  setslider(6, max(choice - 1, 0));
+  on_slider();
 );
 
 set_color(0x666666);
@@ -165,29 +174,25 @@ gfx_line(280, 40, 280, 170);
 gfx_x = 280; gfx_y = 20;
 gfx_drawstr("PITCH");
 
-draw_knob(300, 40, 10, "Amt", 0, -1, 1, 0, 1, sprintf(#, "%.2f", slider(10)));
-draw_knob(360, 40, 11, "Att", 1, 1, 5000, 1, 0, sprintf(#, "%i ms", slider(11)));
-draw_knob(300, 110, 12, "Dec", 70, 1, 5000, 1, 0, sprintf(#, "%i ms", slider(12)));
-draw_knob(360, 110, 13, "Shape", 0, -1, 1, 0, 1, sprintf(#, "%.2f", slider(13)));
-
-draw_button(340, 20, 60, "KTrack", slider(14));
-mouse.left_click && mouse_in_rect(340, 20 - 2, 60, 10 + 2) ? (
-  slider(14) = !slider(14);
-);
+draw_knob(300, 40, 10+32*pad, "Amt", 0, -1, 1, 0, 1, sprintf(#, "%.2f", getslider(10)));
+draw_knob(360, 40, 11+32*pad, "Att", 1, 1, 5000, 1, 0, sprintf(#, "%i ms", getslider(11)));
+draw_knob(300, 110, 12+32*pad, "Dec", 70, 1, 5000, 1, 0, sprintf(#, "%i ms", getslider(12)));
+draw_knob(360, 110, 13+32*pad, "Shape", 0, -1, 1, 0, 1, sprintf(#, "%.2f", getslider(13)));
 
 set_color(0x666666);
 gfx_line(420, 40, 420, 170);
 gfx_x = 420; gfx_y = 20;
 gfx_drawstr("NOISE");
 
-draw_knob(440, 40, 16, "Color", 22050, 20, 22050, 1, 0, sprintf(#, "%i Hz", slider(16)));
-draw_knob(500, 40, 17, "Att", 1, 1, 5000, 1, 0, sprintf(#, "%i ms", slider(17)));
-draw_knob(440, 110, 18, "Dec", 70, 1, 5000, 1, 0, sprintf(#, "%i ms", slider(18)));
-draw_knob(500, 110, 19, "Shape", 0, -1, 1, 0, 1, sprintf(#, "%.2f", slider(19)));
+draw_knob(440, 40, 16+32*pad, "Color", 22050, 20, 22050, 1, 0, sprintf(#, "%i Hz", getslider(16)));
+draw_knob(500, 40, 17+32*pad, "Att", 1, 1, 5000, 1, 0, sprintf(#, "%i ms", getslider(17)));
+draw_knob(440, 110, 18+32*pad, "Dec", 70, 1, 5000, 1, 0, sprintf(#, "%i ms", getslider(18)));
+draw_knob(500, 110, 19+32*pad, "Shape", 0, -1, 1, 0, 1, sprintf(#, "%.2f", getslider(19)));
 
-draw_button(480, 20, 60, slider(15) ? "Stereo" : "Mono", slider(15));
+draw_button(480, 20, 60, getslider(15) ? "Stereo" : "Mono", getslider(15));
 mouse.left_click && mouse_in_rect(480, 20 - 2, 60, 10 + 2) ? (
-  slider(15) = !slider(15);
+  setslider(15, !getslider(15));
+  on_slider();
 );
 
 set_color(0x666666);
@@ -195,39 +200,39 @@ gfx_line(560, 40, 560, 170);
 gfx_x = 560; gfx_y = 20;
 gfx_drawstr("FILTER");
 
-draw_knob(580, 40, 21, "Freq", 22050, 20, 22050, 1, 0, sprintf(#, "%i Hz", slider(21)));
-draw_knob(640, 40, 22, "Q", 0.70, 0.01, 40, 1, 0, sprintf(#, "%.2f", slider(22)));
+draw_knob(580, 40, 21+32*pad, "Freq", 22050, 20, 22050, 1, 0, sprintf(#, "%i Hz", getslider(21)));
+draw_knob(640, 40, 22+32*pad, "Q", 0.70, 0.01, 40, 1, 0, sprintf(#, "%.2f", getslider(22)));
 
-shape_name = filter_shape == 0 ? "LP" : filter_shape == 1 ? "BP" : "HP";
+shape_name = getslider(20) == 0 ? "LP" : getslider(20) == 1 ? "BP" : "HP";
 draw_button(640, 20, 40, shape_name, 0);
 mouse.left_click && mouse_in_rect(640, 20 - 2, 40, 10 + 2) ? (
   gfx_x = 640; gfx_y = 30;
   choice = gfx_showmenu("LP|BP|HP");
-  slider(20) = max(choice - 1, 0);
+  setslider(20, max(choice - 1, 0));
   on_slider();
 );
 
-filter_name = filter_sel == 0 ? "Noise" : filter_sel == 1 ? "Osc" : "Both";
+filter_name = getslider(23) == 0 ? "Noise" : getslider(23) == 1 ? "Osc" : "Both";
 draw_button(630, 110, 50, filter_name, 0);
 mouse.left_click && mouse_in_rect(630, 110, 50, 10+2) ? (
   gfx_x = 630; gfx_y = 120;
   choice = gfx_showmenu("Filter noise|Filter osc|Filter both");
-  slider(23) = max(choice - 1, 0);
+  setslider(23, max(choice - 1, 0));
 );
 
 set_color(0x666666);
 gfx_x = 20; gfx_y = 180;
 gfx_drawstr("VELOCITY");
 
-draw_knob(20, 200, 27, "Vol", 1, 0, 1, 0, 0, sprintf(#, "%.2f", slider(27)));
+draw_knob(20, 200, 27, "Vol", 1, 0, 1, 0, 0, sprintf(#, "%.2f", getslider(27)));
 
 set_color(0x666666);
 gfx_x = 140; gfx_y = 180;
 gfx_drawstr("EQ");
 
-draw_knob(160, 200, 24, "Freq", 440, 20, 22050, 1, 0, sprintf(#, "%i Hz", slider(24)));
-draw_knob(220, 200, 25, "Gain", 0, -18, 18, 0, 1, sprintf(#, "%.2f Db", slider(25)));
-draw_knob(280, 200, 26, "Q", 0.70, 0.01, 40, 1, 0, sprintf(#, "%.2f", slider(26)));
+draw_knob(160, 200, 24+32*pad, "Freq", 440, 20, 22050, 1, 0, sprintf(#, "%i Hz", getslider(24)));
+draw_knob(220, 200, 25+32*pad, "Gain", 0, -18, 18, 0, 1, sprintf(#, "%.2f Db", getslider(25)));
+draw_knob(280, 200, 26+32*pad, "Q", 0.70, 0.01, 40, 1, 0, sprintf(#, "%.2f", getslider(26)));
 
 function on_knob_move (nslider, slider_min, slider_max, slider_is_log, factor) (
   factor *= mouse.control ? 0.05 : 1;
@@ -241,8 +246,8 @@ function on_knob_move (nslider, slider_min, slider_max, slider_is_log, factor) (
   slider(nslider) > slider_max ? slider(nslider) = slider_max;
   slider(nslider) < slider_min ? slider(nslider) = slider_min;
   on_slider();
-  sliderchange(slider(nslider));
-  slider_automate(slider(nslider));
+  sliderchange(nslider);
+  slider_automate(nslider);
 );
 
 wheelknob_nslider ? (
@@ -255,12 +260,11 @@ selknob_nslider && mouse.left && mouse.dy != 0 ? (
 
 doubleclk_nslider ? (
   on_slider();
-  sliderchange(slider(doubleclk_nslider));
-  slider_automate(slider(doubleclk_nslider));
+  sliderchange(doubleclk_nslider);
+  slider_automate(doubleclk_nslider);
   doubleclk_nslider = 0;
 );
 
 gfx_setcursor(selknob_nslider ? 32511 : 0);
 !mouse.wheel ? wheelknob_nslider = 0;
 !mouse.left ? selknob_nslider = 0;
-*/

@@ -166,7 +166,7 @@ function pad_process()
 instance(npad, out_r, out_l, note_on, note_vel, note_counter, osc_cycle, osc_freq, osc_wave,
         osc_att, osc_dec, noise_att, noise_dec, envelope, pitch_envelope, noise_envelope,
         pitch_amt, noise_lowpass, noise_cutoff, noise_filter, filter_freq, filter_q, filter_shape,
-        filter_sel, mix, pan, eq, vel_vol, gain, vel_mult)
+        filter_sel, mix, pan, eq, eq_gain, vel_vol, gain, vel_mult, distortion, tube, noise_stereo)
 local (wave_l, wave_r, noise_l, noise_r, signal_merged, mult)
 (
   out_l = 0;
@@ -190,8 +190,8 @@ local (wave_l, wave_r, noise_l, noise_r, signal_merged, mult)
     noise_l = make_noise() * noise_envelope.env;
     noise_r = noise_stereo ? make_noise() * noise_envelope.env : noise_l;
 
-    noise_lowpass.zdf_tick();
     noise_cutoff < 22000 ? (
+      noise_lowpass.zdf_tick();
       noise_l = noise_lowpass.zdf_svf0(noise_l);
       noise_r = noise_lowpass.zdf_svf1(noise_r);
     );
@@ -214,11 +214,11 @@ local (wave_l, wave_r, noise_l, noise_r, signal_merged, mult)
     );
 
     signal_merged = 0;
-    noise_filter.zdf_tick();
     (filter_shape == 0 && filter_freq < 22000) ||
     (filter_shape == 1) ||
     (filter_shape == 2 && filter_freq > 20) ?
     (
+      noise_filter.zdf_tick();
       mult = filter_shape == 1 ? filter_q : 1;
       filter_sel == 0 ? (
         noise_l = noise_filter.zdf_svf0(noise_l) * mult;
@@ -241,103 +241,20 @@ local (wave_l, wave_r, noise_l, noise_r, signal_merged, mult)
       out_r = noise_r + wave_r;
     );
 
-    //distortion > 0 ? (
-    //  tube.smooth();
-    //  outl = tube.amp(outl);
-    //  outr = tube.amp(outr);
-    //);
+    distortion > 0 ? (
+      tube.smooth();
+      out_l = tube.amp(out_l);
+      out_r = tube.amp(out_r);
+    );
 
-    eq.zdf_tick();
-    out_l = eq.zdf_svf0(out_l);
-    out_r = eq.zdf_svf1(out_r);
+    eq_gain ? (
+      eq.zdf_tick();
+      out_l = eq.zdf_svf0(out_l);
+      out_r = eq.zdf_svf1(out_r);
+    );
 
     vel_mult = min(note_vel + (1 - vel_vol), 1);
     out_l *= gain * vel_mult.smooth();
     out_r *= gain * vel_mult.smooth();
-
-    /*
-    note_counter += 1 / srate * 1000;
-    note_counter > osc_att + osc_dec && note_counter > noise_att + noise_dec ? (
-      note_on = 0;
-      envelope.zen_release();
-      pitch_envelope.zen_release();
-      noise_envelope.zen_release();
-    );
-    envelope.zen_process();
-    pitch_envelope.zen_process();
-    noise_envelope.zen_process();
-
-    freq = pitch_track ? note_freq : osc_freq;
-    osc_cycle = wrap(osc_cycle + freq / srate * pow(16, pitch_amt * pitch_envelope.env));
-    wave_l = make_wave(osc_cycle) * envelope.env;
-    wave_r = wave_l;
-    noise_l = make_noise() * noise_envelope.env;
-    noise_r = noise_stereo ? make_noise() * noise_envelope.env : noise_l;
-
-    noise_lowpass.zdf_tick();
-    noise_cutoff < 22000 ? (
-      noise_l = noise_lowpass.zdf_svf0(noise_l);
-      noise_r = noise_lowpass.zdf_svf1(noise_r);
-    );
-
-    mix < 0 ? (
-      noise_l *= 1 + mix;
-      noise_r *= 1 + mix;
-    );
-    mix > 0 ? (
-      wave_l *= 1 - mix;
-      wave_r *= 1 - mix;
-    );
-    pan < 0 ? (
-      noise_r *= 1 + pan;
-      wave_r *= 1 + pan;
-    );
-    pan > 0 ? (
-      noise_l *= 1 - pan;
-      wave_l *= 1 - pan;
-    );
-
-    signal_merged = 0;
-    noise_filter.zdf_tick();
-    (filter_shape == 0 && filter_freq < 22000) ||
-    (filter_shape == 1) ||
-    (filter_shape == 2 && filter_freq > 20) ?
-    (
-      mult = filter_shape == 1 ? filter_q : 1;
-      filter_sel == 0 ? (
-        noise_l = noise_filter.zdf_svf0(noise_l) * mult;
-        noise_r = noise_filter.zdf_svf1(noise_r) * mult;
-        1;
-      );
-      filter_sel == 1 ? (
-        wave_l = noise_filter.zdf_svf0(wave_l) * mult;
-        wave_r = noise_filter.zdf_svf1(wave_r) * mult;
-      );
-      filter_sel == 2 ? (
-        outl = noise_filter.zdf_svf0(wave_l + noise_l) * mult;
-        outr = noise_filter.zdf_svf1(wave_r + noise_r) * mult;
-        signal_merged = 1;
-      );
-    );
-
-    !signal_merged ? (
-      outl = noise_l + wave_l;
-      outr = noise_r + wave_r;
-    );
-
-    distortion > 0 ? (
-      tube.smooth();
-      outl = tube.amp(outl);
-      outr = tube.amp(outr);
-    );
-
-    eq.zdf_tick();
-    outl = eq.zdf_svf0(outl);
-    outr = eq.zdf_svf1(outr);
-
-    vel_mult = min(note_vel + (1 - vel_vol), 1);
-    spl0 += outl * gain * vel_mult.smooth();
-    spl1 += outr * gain * vel_mult.smooth();
-    */
   );
 );
