@@ -39,7 +39,7 @@ slider23:filter_sel=0<1, 0, 1{Noise,Osc,Both}>-Filter target
 slider24:eq_freq=440<20, 22050, 1:log>-EQ frequency
 slider25:eq_gain=0<0, -18, 18>-EQ gain
 slider26:eq_q=0.70<0.01, 40, 0.01:log>-EQ Q
-slider27:vel_vol=0<0, 1, 0.01>-Velocity volume
+slider27:vel_vol=0<0, 1, 0.01>Velocity volume
 
 // PAD2
 slider33:-1<-1, 1, .01>-Mix (Osc - Noise)
@@ -96,41 +96,6 @@ function get_note_name() (
   note = freq2note(osc_freq);
   sprintf(#, "%s%i", notes[note % 12], floor(note / 12) - 1);
 );
-
-// Parameter smoothing
-function rc_set(rc)
-  instance(a) (
-    a = 1 / (rc * srate + 1);
-);
-function rc_lp(sample)
-  instance(lp, a) (
-    lp += a * (sample - lp);
-);
-function smooth()
-  instance (lp, smooth) (
-    lp = smooth;
-    smooth = this.rc_lp(this);
-);
-
-tube.rc_set(0.0033);
-tube.smooth = db2gain(distortion);
-vel_mult.rc_set(0.0066);
-vel_mult.smooth = 0;
-
-// Distortion
-function tanh(x) (
-  x = exp(2*x);
-  (x - 1) / (x + 1);
-);
-dc = 0.05;
-tanh_dc = tanh(dc);
-function amp(x) (
-  tanh(this.smooth * x + dc) - tanh_dc;
-);
-
-noise_filter.zdf_set_sample_rate(srate);
-noise_lowpass.zdf_set_sample_rate(srate);
-eq.zdf_set_sample_rate(srate);
 
 pad1.pad_init(0);
 pad2.pad_init(1);
