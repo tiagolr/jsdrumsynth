@@ -148,5 +148,5 @@ function gfx_draw_help () (
   gfx_y = 315/2-100+10;
   gfx_a = 1;
   set_color(0xfffffff);
-  gfx_drawstr("JSDRUMSYNTH\n\n\n\n- Double click to reset knobs\n\n- Ctrl + mouse for fine adjustments\n\n- Right clicks pads for copy paste\n\n- Copy paste works across multiple FX instances", 1);
+  gfx_drawstr("JSDRUMSYNTH\n\n\n\n- Double click to reset knobs\n\n- Ctrl + mouse for fine adjustments\n\n- Right click pads for copy paste\n\n- Copy paste works across multiple FX instances", 1);
 );
