@@ -9,30 +9,30 @@ import ds.gfxlib.jsfx-inc
 import ds.svf_filter.jsfx-inc
 import ds.pad.jsfx-inc
 
-in_pin:inl;
-in_pin:inr;
-out_pin:pad1l
-out_pin:pad1r
-out_pin:pad2l
-out_pin:pad2r
-out_pin:pad3l
-out_pin:pad3r
-out_pin:pad4l
-out_pin:pad4r
-out_pin:pad5l
-out_pin:pad5r
-out_pin:pad6l
-out_pin:pad6r
-out_pin:pad7l
-out_pin:pad7r
+in_pin:Lin;
+in_pin:Rin;
+out_pin:Lpad1
+out_pin:Rpad1
+out_pin:Lpad2
+out_pin:Rpad2
+out_pin:Lpad3
+out_pin:Rpad3
+out_pin:Lpad4
+out_pin:Rpad4
+out_pin:Lpad5
+out_pin:Rpad5
+out_pin:Lpad6
+out_pin:Rpad6
+out_pin:Lpad7
+out_pin:Rpad7
 
 slider256:multiout=0<0,1,1{No, Yes}>-Multi out
 
 // PAD1
-slider1:mix=-1<-1, 1, .01>-Mix (Osc - Noise)
-slider2:vol=-12<-90, 0, .01>-Volume
-slider3:pan=0<-1, 1, .01>-Pan
-slider4:distortion=0<0, 48, 0.1>-Drive Db
+slider1:mix=-1<-1, 1, .01>-Pad1 Mix (Osc - Noise)
+slider2:vol=-12<-90, 0, .01>-Pad1 Volume
+slider3:pan=0<-1, 1, .01>-Pad1 Pan
+slider4:distortion=0<0, 48, 0.1>-Pad1 Drive Db
 
 slider5:osc_freq=440<20, 10000, 1:log>-Pad1 Frequency (Hz)
 slider6:osc_wave=0<0, 3, 1{Sine,Triangle,Saw,Square}>-Pad1 Wave
@@ -40,7 +40,7 @@ slider7:osc_att=1<1, 5000, 1:log>-Pad1 Attack
 slider8:osc_dec=70<1, 5000, 1:log>-Pad1 Decay
 slider9:osc_shape=0<-1, 1, .01>-Pad1 Shape
 
-slider10:pitch_amt=0<-1, 1, 0.01>-Pad1 Pitch ammount
+slider10:pitch_amt=0<-1, 1, 0.01>-Pad1 Pitch amount
 slider11:pitch_att=1<1, 5000, 1:log>-Pad1 Pitch attack
 slider12:pitch_dec=70<1, 5000, 1:log>-Pad1 Pitch decay
 slider13:pitch_shape=0<-1, 1, 0.01>-Pad1 Pitch shape
@@ -73,7 +73,7 @@ slider39:1<1, 5000, 1:log>-Pad2 Attack
 slider40:70<1, 5000, 1:log>-Pad2 Decay
 slider41:0<-1, 1, .01>-Pad2 Shape
 
-slider42:0<-1, 1, 0.01>-Pad2 Pitch ammount
+slider42:0<-1, 1, 0.01>-Pad2 Pitch amount
 slider43:1<1, 5000, 1:log>-Pad2 Pitch attack
 slider44:70<1, 5000, 1:log>-Pad2 Pitch decay
 slider45:0<-1, 1, 0.01>-Pad2 Pitch shape
@@ -106,7 +106,7 @@ slider71:1<1, 5000, 1:log>-Pad3 Attack
 slider72:70<1, 5000, 1:log>-Pad3 Decay
 slider73:0<-1, 1, .01>-Pad3 Shape
 
-slider74:0<-1, 1, 0.01>-Pad3 Pitch ammount
+slider74:0<-1, 1, 0.01>-Pad3 Pitch amount
 slider75:1<1, 5000, 1:log>-Pad3 Pitch attack
 slider76:70<1, 5000, 1:log>-Pad3 Pitch decay
 slider77:0<-1, 1, 0.01>-Pad3 Pitch shape
@@ -139,7 +139,7 @@ slider103:1<1, 5000, 1:log>-Pad4 Attack
 slider104:70<1, 5000, 1:log>-Pad4 Decay
 slider105:0<-1, 1, .01>-Pad4 Shape
 
-slider106:0<-1, 1, 0.01>-Pad4 Pitch ammount
+slider106:0<-1, 1, 0.01>-Pad4 Pitch amount
 slider107:1<1, 5000, 1:log>-Pad4 Pitch attack
 slider108:70<1, 5000, 1:log>-Pad4 Pitch decay
 slider109:0<-1, 1, 0.01>-Pad4 Pitch shape
@@ -172,7 +172,7 @@ slider135:1<1, 5000, 1:log>-Pad5 Attack
 slider136:70<1, 5000, 1:log>-Pad5 Decay
 slider137:0<-1, 1, .01>-Pad5 Shape
 
-slider138:0<-1, 1, 0.01>-Pad5 Pitch ammount
+slider138:0<-1, 1, 0.01>-Pad5 Pitch amount
 slider139:1<1, 5000, 1:log>-Pad5 Pitch attack
 slider140:70<1, 5000, 1:log>-Pad5 Pitch decay
 slider141:0<-1, 1, 0.01>-Pad5 Pitch shape
@@ -205,7 +205,7 @@ slider167:1<1, 5000, 1:log>-Pad6 Attack
 slider168:70<1, 5000, 1:log>-Pad6 Decay
 slider169:0<-1, 1, .01>-Pad6 Shape
 
-slider170:0<-1, 1, 0.01>-Pad6 Pitch ammount
+slider170:0<-1, 1, 0.01>-Pad6 Pitch amount
 slider171:1<1, 5000, 1:log>-Pad6 Pitch attack
 slider172:70<1, 5000, 1:log>-Pad6 Pitch decay
 slider173:0<-1, 1, 0.01>-Pad6 Pitch shape
@@ -238,7 +238,7 @@ slider199:1<1, 5000, 1:log>-Pad6 Attack
 slider200:70<1, 5000, 1:log>-Pad6 Decay
 slider201:0<-1, 1, .01>-Pad6 Shape
 
-slider202:0<-1, 1, 0.01>-Pad6 Pitch ammount
+slider202:0<-1, 1, 0.01>-Pad6 Pitch amount
 slider203:1<1, 5000, 1:log>-Pad6 Pitch attack
 slider204:70<1, 5000, 1:log>-Pad6 Pitch decay
 slider205:0<-1, 1, 0.01>-Pad6 Pitch shape
@@ -259,9 +259,13 @@ slider217:0<0, -18, 18>-Pad6 EQ gain
 slider218:0.70<0.01, 40, 0.01:log>-Pad6 EQ Q
 slider219:0<0, 1, 0.01>-Pad6 Velocity volume
 
+@serialize
+
+1; // empty @serialize prevents pad reset on playback
+
 @init
 
-pad = 0;
+// pad = 0; -- global var init as zero
 notes = 0;
 notes[0]="C";notes[1]="C#";notes[2]="D";notes[3]="D#";
 notes[4]="E";notes[5]="F";notes[6]="F#";notes[7]="G";
@@ -454,10 +458,10 @@ gfx_clear = 0x141618;
 mouse.update_mouse_state();
 
 btnw = (700 - 40) / 7;
-draw_button(700 - 40 - 20, 5, 40, multiout ? "7Ch" : "1Ch", 0);
-mouse.left_click && mouse_in_rect(700 - 40 - 20, 0, 40, 15) ? (
+draw_grey_button(700 - 40 - 20, 6, 40, multiout ? "7Out" : "1Out");
+mouse.left_click && mouse_in_rect(700 - 40 - 20, 0, 40, 16) ? (
   gfx_x = mouse_x; gfx_y = mouse_y;
-  choice = gfx_showmenu("1 Channel|7 Channels");
+  choice = gfx_showmenu("1 Output|7 Outputs");
   choice == 1 ? multiout = 0;
   choice == 2 ? multiout = 1;
 );
@@ -660,8 +664,8 @@ function on_knob_move (nslider, slider_min, slider_max, slider_is_log, factor) (
   slider(nslider) > slider_max ? slider(nslider) = slider_max;
   slider(nslider) < slider_min ? slider(nslider) = slider_min;
   on_slider();
-  sliderchange(nslider);
-  slider_automate(nslider);
+  sliderchange(slider(nslider));
+  slider_automate(slider(nslider));
 );
 
 wheelknob_nslider ? (
@@ -674,8 +678,8 @@ selknob_nslider && mouse.left && mouse.dy != 0 ? (
 
 doubleclk_nslider ? (
   on_slider();
-  sliderchange(doubleclk_nslider);
-  slider_automate(doubleclk_nslider);
+  sliderchange(slider(doubleclk_nslider));
+  slider_automate(slider(doubleclk_nslider));
   doubleclk_nslider = 0;
 );
 
