@@ -458,12 +458,20 @@ gfx_clear = 0x141618;
 mouse.update_mouse_state();
 
 btnw = (700 - 40) / 7;
-draw_grey_button(700 - 40 - 20, 6, 40, multiout ? "7Out" : "1Out");
-mouse.left_click && mouse_in_rect(700 - 40 - 20, 0, 40, 16) ? (
+draw_grey_button(700 - 40 - 20 - 20, 6, 40, multiout ? "7Out" : "1Out");
+mouse.left_click && mouse_in_rect(700 - 40 - 20 - 20, 0, 40, 16) ? (
   gfx_x = mouse_x; gfx_y = mouse_y;
   choice = gfx_showmenu("1 Output|7 Outputs");
   choice == 1 ? multiout = 0;
   choice == 2 ? multiout = 1;
+);
+
+mouse.left_click && draw_help ? (
+  draw_help = 0;
+);
+draw_grey_button(700 - 35, 6, 15, "?");
+mouse.left_click && mouse_in_rect(700 - 35, 0, 15, 16) ? (
+  draw_help = 1;
 );
 
 draw_pad_button(20, 20, btnw, 20, "Pad 1C", pad == 0, pad1.note_on);
@@ -583,7 +591,7 @@ draw_button(220, 20+40, 40, shape_name, 0);
 mouse.left_click && mouse_in_rect(220, 20 - 2 +40, 40, 10 + 2) ? (
   gfx_x = 220; gfx_y = 30+40;
   choice = gfx_showmenu("Sine|Triangle|Saw|Square");
-  choice > 1 ? setslider(6, choice - 1);
+  choice > 0 ? setslider(6, choice - 1);
   on_slider();
 );
 
@@ -626,7 +634,7 @@ draw_button(640, 20+40, 40, shape_name, 0);
 mouse.left_click && mouse_in_rect(640, 20 - 2+40, 40, 10 + 2) ? (
   gfx_x = 640; gfx_y = 30+40;
   choice = gfx_showmenu("LP|BP|HP");
-  choice > 1 ? setslider(20, choice - 1);
+  choice > 0 ? setslider(20, choice - 1);
   on_slider();
 );
 
@@ -635,7 +643,7 @@ draw_button(630, 110+40, 50, filter_name, 0);
 mouse.left_click && mouse_in_rect(630, 110+40, 50, 10+2) ? (
   gfx_x = 630; gfx_y = 120+40;
   choice = gfx_showmenu("Filter noise|Filter osc|Filter both");
-  choice > 1 ? setslider(23, choice - 1);
+  choice > 0 ? setslider(23, choice - 1);
 );
 
 set_color(0x666666);
@@ -666,6 +674,10 @@ function on_knob_move (nslider, slider_min, slider_max, slider_is_log, factor) (
   on_slider();
   sliderchange(slider(nslider));
   slider_automate(slider(nslider));
+);
+
+draw_help ? (
+  gfx_draw_help();
 );
 
 wheelknob_nslider ? (

@@ -139,3 +139,14 @@ function draw_pad_button (x, y, w, h, label, toggled, note_on) (
   gfx_y = y;
   gfx_drawstr(label, 1|4, x+w, y+h);
 );
+
+function gfx_draw_help () (
+  set_color(0x000000);
+  gfx_a = 0.9;
+  gfx_rect(700/2-200, 315 / 2 - 100, 400, 110);
+  gfx_x = 700/2-200+10;
+  gfx_y = 315/2-100+10;
+  gfx_a = 1;
+  set_color(0xfffffff);
+  gfx_drawstr("JSDRUMSYNTH\n\n\n\n- Double click to reset knobs\n\n- Ctrl + mouse for fine adjustments\n\n- Right clicks pads for copy paste\n\n- Copy paste works across multiple FX instances", 1);
+);
