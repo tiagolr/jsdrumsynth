@@ -33,7 +33,7 @@ slider1:mix=-1<-1, 1, .01>-Mix (Osc - Noise)
 slider2:vol=-12<-90, 0, .01>-Volume
 slider3:pan=0<-1, 1, .01>-Pan
 slider4:distortion=0<0, 48, 0.1>-Drive Db
- 
+
 slider5:osc_freq=440<20, 10000, 1:log>-Pad1 Frequency (Hz)
 slider6:osc_wave=0<0, 3, 1{Sine,Triangle,Saw,Square}>-Pad1 Wave
 slider7:osc_att=1<1, 5000, 1:log>-Pad1 Attack
@@ -409,13 +409,19 @@ while (midirecv(offset, msg1, note, vel)) (
 
 @sample
 
-pad1.pad_process();
-pad2.pad_process();
-pad3.pad_process();
-pad4.pad_process();
-pad5.pad_process();
-pad6.pad_process();
-pad7.pad_process();
+reset_filters = 0;
+last_play_state == 0 && play_state ? (
+  reset_filters = 1;
+);
+last_play_state = play_state;
+
+pad1.pad_process(reset_filters);
+pad2.pad_process(reset_filters);
+pad3.pad_process(reset_filters);
+pad4.pad_process(reset_filters);
+pad5.pad_process(reset_filters);
+pad6.pad_process(reset_filters);
+pad7.pad_process(reset_filters);
 
 multiout ? (
   spl0 += pad1.out_l;
