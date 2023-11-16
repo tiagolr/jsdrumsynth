@@ -55,7 +55,7 @@ function amp(x) (
 function pad_init(npad)
 (
   this.npad = npad;
-  this.osc_cycle = 0;
+  this.osc_cycle = 0.25;
   this.note_on = 0;
   this.note_counter = 0;
   this.note_vel = 0;
@@ -67,10 +67,10 @@ function pad_init(npad)
   this.tube.rc_set(0.0033);
   this.tube.smooth = db2gain(0);
   this.vel_mult.rc_set(0.0066);
-  this.vel_mult.smooth = 0;
+  this.vel_mult.smooth = 1;
 );
 
-function pad_on_note(note, vel)
+function pad_on_note(vel)
 (
   this.note_on = 1;
   this.note_vel = vel / 127;
@@ -160,6 +160,7 @@ function pad_on_slider()
   );
   this.eq.zdf_eq(this.eq_freq, this.eq_q, db2gain(this.eq_gain));
   this.envelope_refresh();
+  this.slider_changed_filter_fix = 1;
 );
 
 function pad_process()
@@ -169,8 +170,19 @@ instance(npad, out_r, out_l, note_on, note_vel, note_counter, osc_cycle, osc_fre
         filter_sel, mix, pan, eq, eq_gain, vel_vol, gain, vel_mult, distortion, tube, noise_stereo)
 local (wave_l, wave_r, noise_l, noise_r, signal_merged, mult)
 (
-  out_l = 0;
-  out_r = 0;
+  // FIX - interpolate filters so they reach their base position.
+  //     - first note on first beat is still wrongly filtered,
+  this.slider_changed_filter_fix ? ( 
+    noise_lowpass.zdf_tick();
+    eq.zdf_tick();
+    noise_filter.zdf_tick();
+
+    this.slider_changed_filter_fix += 1;
+    this.slider_changed_filter_fix > 1000 ? (
+      this.slider_changed_filter_fix = 0;
+    );
+  );
+  eq.zdf_tick();
   note_on ? (
     note_counter += 1 / srate * 1000;
     note_counter > osc_att + osc_dec && note_counter > noise_att + noise_dec ? (
@@ -191,7 +203,7 @@ local (wave_l, wave_r, noise_l, noise_r, signal_merged, mult)
     noise_r = noise_stereo ? make_noise() * noise_envelope.env : noise_l;
 
     noise_cutoff < 22000 ? (
-      noise_lowpass.zdf_tick();
+      !this.slider_changed_filter_fix && noise_lowpass.zdf_tick();
       noise_l = noise_lowpass.zdf_svf0(noise_l);
       noise_r = noise_lowpass.zdf_svf1(noise_r);
     );
@@ -214,11 +226,12 @@ local (wave_l, wave_r, noise_l, noise_r, signal_merged, mult)
     );
 
     signal_merged = 0;
+
     (filter_shape == 0 && filter_freq < 22000) ||
     (filter_shape == 1) ||
     (filter_shape == 2 && filter_freq > 20) ?
     (
-      noise_filter.zdf_tick();
+      !slider_changed_filter_fix && noise_filter.zdf_tick();
       mult = filter_shape == 1 ? filter_q : 1;
       filter_sel == 0 ? (
         noise_l = noise_filter.zdf_svf0(noise_l) * mult;
@@ -240,15 +253,15 @@ local (wave_l, wave_r, noise_l, noise_r, signal_merged, mult)
       out_l = noise_l + wave_l;
       out_r = noise_r + wave_r;
     );
-
-    distortion > 0 ? (
+    
+    distortion ? (
       tube.smooth();
       out_l = tube.amp(out_l);
       out_r = tube.amp(out_r);
     );
 
     eq_gain ? (
-      eq.zdf_tick();
+      !slider_changed_filter_fix && eq.zdf_tick();
       out_l = eq.zdf_svf0(out_l);
       out_r = eq.zdf_svf1(out_r);
     );

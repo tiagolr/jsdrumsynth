@@ -116,3 +116,18 @@ function draw_button (x, y, w, label, toggled) (
   set_color(toggled ? 0xFFFFFF : 0x5DBEE4);
   gfx_drawstr(label, 1, x+w, y+10);
 );
+
+function draw_pad_button (x, y, w, h, label, toggled, note_on) (
+  note_on ? (
+    set_color(0x333333);
+    gfx_rect(x, y, w, h);
+  );
+  toggled ? (
+    set_color(note_on ? 0x1ea9df : 0x5DBEE4);
+    gfx_rect(x, y, w, h);
+  );
+  set_color(toggled ? 0xFFFFFF : 0x666666);
+  gfx_x = x;
+  gfx_y = y;
+  gfx_drawstr(label, 1|4, x+w, y+h);
+);
