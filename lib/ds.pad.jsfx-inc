@@ -162,18 +162,21 @@ function pad_on_slider()
   this.envelope_refresh();
 );
 
-function pad_process(reset_filters)
+function reset_filters() 
+instance(eq, noise_filter, noise_lowpass) 
+(
+  eq.svf_single_set_to_target();
+  noise_lowpass.svf_single_set_to_target();
+  noise_filter.svf_single_set_to_target();
+);
+
+function pad_process()
 instance(npad, out_r, out_l, note_on, note_vel, note_counter, osc_cycle, osc_freq, osc_wave,
         osc_att, osc_dec, noise_att, noise_dec, envelope, pitch_envelope, noise_envelope,
         pitch_amt, noise_lowpass, noise_cutoff, noise_filter, filter_freq, filter_q, filter_shape,
         filter_sel, mix, pan, eq, eq_gain, vel_vol, gain, vel_mult, distortion, tube, noise_stereo)
 local (wave_l, wave_r, noise_l, noise_r, signal_merged, mult)
 (
-  reset_filters ? (
-    eq.svf_single_set_to_target();
-    noise_lowpass.svf_single_set_to_target();
-    noise_filter.svf_single_set_to_target();
-  );
   note_on ? (
     note_counter += 1 / srate * 1000;
     note_counter > osc_att + osc_dec && note_counter > noise_att + noise_dec ? (

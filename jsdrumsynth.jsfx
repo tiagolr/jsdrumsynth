@@ -409,19 +409,24 @@ while (midirecv(offset, msg1, note, vel)) (
 
 @sample
 
-reset_filters = 0;
 last_play_state == 0 && play_state ? (
-  reset_filters = 1;
+  pad1.reset_filters();
+	pad2.reset_filters();
+	pad3.reset_filters();
+	pad4.reset_filters();
+	pad5.reset_filters();
+	pad6.reset_filters();
+	pad7.reset_filters();
 );
 last_play_state = play_state;
 
-pad1.pad_process(reset_filters);
-pad2.pad_process(reset_filters);
-pad3.pad_process(reset_filters);
-pad4.pad_process(reset_filters);
-pad5.pad_process(reset_filters);
-pad6.pad_process(reset_filters);
-pad7.pad_process(reset_filters);
+pad1.pad_process();
+pad2.pad_process();
+pad3.pad_process();
+pad4.pad_process();
+pad5.pad_process();
+pad6.pad_process();
+pad7.pad_process();
 
 multiout ? (
   spl0 += pad1.out_l;
